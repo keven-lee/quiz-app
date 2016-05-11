@@ -1,86 +1,82 @@
-$(document).ready(function () {
+$(document).ready(function() {
  'use strict';
- var allQuestions = [{
-   question: 'What is the capital city of Australia?',
-   choices: ['Sydney', 'Melbourne', 'Canberra', 'Brisbane'],
-   correctAnswer: 2
+
+ var questions = [{
+  question: 'What is the capital city of Australia?',
+  choices: ['Sydney', 'Melbourne', 'Canberra', 'Brisbane'],
+  correctAnswer: 'Canberra'
  }, {
-   question: 'What is the capital city of Germany?',
-   choices: ['Frankfurt', 'Berlin', 'Munich', 'Hamburg'],
-   correctAnswer: 1
+  question: 'What is the capital city of Germany?',
+  choices: ['Frankfurt', 'Berlin', 'Munich', 'Hamburg'],
+  correctAnswer: 'Berlin'
  }, {
-   question: 'What is the capital city of Russia?',
-   choices: ['Moscow', 'Saint Petersburg', 'Novosibirsk', 'Volgograd'],
-   correctAnswer: 0
+  question: 'What is the capital city of Russia?',
+  choices: ['Moscow', 'Saint Petersburg', 'Novosibirsk', 'Volgograd'],
+  correctAnswer: 'Moscow'
  }, {
-   question: 'What is the capital city of China?',
-   choices: ['Wuhan', 'Guangzhou', 'Shanghai', 'Beijing'],
-   correctAnswer: 3
+  question: 'What is the capital city of China?',
+  choices: ['Wuhan', 'Guangzhou', 'Shanghai', 'Beijing'],
+  correctAnswer: 'Beijing'
  }, {
-   question: 'What is the capital city of Mexico?',
-   choices: ['Mexico City', 'Guadalajara', 'Tijuana', 'Acapulco'],
-   correctAnswer: 0
+  question: 'What is the capital city of Mexico?',
+  choices: ['Mexico City', 'Guadalajara', 'Tijuana', 'Acapulco'],
+  correctAnswer: 'Mexico City'
  }];
 
  var currentQuestion = 0;
  var score = 0;
- var answerKey = [2, 1, 0, 3, 0]
 
+ init();
 
-
- function newGame() {
-   currentQuestion = 0;
-   score = 0;
-   
-  
+ function init() {
+  generateChoices();
  }
 
-
-
- $('body').on('click', '.nextButton', function () {
-
-   $(this).val('Next');
-
-   validate();
-   if (currentQuestion < allQuestions.length) {
-     populateQuestion(currentQuestion);
-     currentQuestion++;
-   } 
-
+ $('.choices').on('click', 'li', function() {
+  validateChoice($(this).text());
  });
 
-
-
- function populateQuestion(i) {
-   var individualQuestion = allQuestions[i];
-   $('#questionTitle').text(individualQuestion.question);
-   $('#selectionList').empty();
-   for (var j = 0; j < individualQuestion.choices.length; j++) {
-     $('#selectionList').append("<input type='radio' name = 'choices' id='radio_" + j + "'>" + individualQuestion.choices[j] + "</input>");
-   }
+ function reset() {
+  currentQuestion = 0;
+  score = 0;
+  $('.message').empty()
+  init();
  }
 
- function validate() {
-   if (currentQuestion > allQuestions.length - 1) {
-     if ($("#radio_"+answerKey[currentQuestion-1]+"").is(":checked")) {
-     score++;
-     } 
-     $('#questionTitle').text('You scored ' + score + ' out of 5!');
-     $('#selectionList').empty();
-     $('.nextButton').val('Start');
-     $('.nextButton').on('click', function() {
-      newGame();
-     });
+ function generateChoices() {
 
-   } else if ($("input[type=radio]:checked").length < 1 && currentQuestion != 0) {
-     alert('Please select a city');
-     preventDefault();
+  if (currentQuestion >= questions.length) {
+   $('.message').text('Your answered ' + score + ' questions!');
+   $('.question').text('Click to reset')
+   $('.question').on('click', function() {
+    reset();
+   })
+  }
 
-   } else if ($("#radio_"+answerKey[currentQuestion-1]+"").is(":checked")) {
-     score++;
-   }
+  $('.question').text(questions[currentQuestion].question);
+  for (var i = 0; i < questions[currentQuestion].choices.length; i++) {
+   $('.choices').append('<li>' + questions[currentQuestion].choices[i] + '</li>');
+  }
  }
 
+ function nextQuestion() {
+  currentQuestion++;
+  score++;
+  emptyPreviousQuestion();
+  generateChoices();
+ }
 
+ function emptyPreviousQuestion() {
+  $('.choices').empty();
+  $('.question').empty();
+ }
 
+ function validateChoice(choice) {
+  if (choice === questions[currentQuestion].correctAnswer) {
+   $('.message').text('answer is correct');
+   nextQuestion();
+  } else {
+   $('.message').text('incorrect');
+  }
+ }
 });
